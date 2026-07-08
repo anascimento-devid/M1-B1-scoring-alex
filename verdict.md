@@ -15,21 +15,32 @@ critères d'évaluation.)
 ## Verdict chiffré
 
 | Métrique | Baseline 2017 (Pyrenex-risk-v1) | Modèle retenu (v2) | Variation |
-|---|---|---|---|
-| F1 macro (holdout) | … | … | … |
-| F1 défaut | … | … | … |
-| ROC-AUC | … | … | … |
-| Recall défaut | … | … | … |
+|---|---------------------------------|---|-----------|
+| F1 macro (holdout) | 0.5018                          |  0.6088 | +0.10     |
+| F1 défaut | 0.09                             | 0.4327 | +0.34     |
+| ROC-AUC | 0.7296                          | 0.7443 | +0.01     |
+| Recall défaut | 0.05                            | 0.64 | +0.59     |
 
 **Configuration retenue** : (rappel des hyperparamètres principaux)
-
+    
+```
+"balanced_regularized": {
+        "n_estimators": 500,
+        "max_depth": 12,
+        "min_samples_leaf": 30,
+        "min_samples_split": 50,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample",
+        "random_state": 42,
+        "n_jobs": -1,
+    },
+```
 ## Trade-off explicité au métier
 
-(2-3 phrases : qu'est-ce que le client gagne ? qu'est-ce qu'il perd ?
-Par exemple : *« le rappel défaut passe de 14% à 61% — soit 4× plus de
-mauvais payeurs détectés — au prix d'une précision défaut qui passe de
-38% à 41%. En clair : pour rattraper plus de défauts, le modèle déclenche
-davantage de fausses alertes. »*)
+Le nouveau modèle déclare plus facilement des faux positifs, et détecte donc bien plus de dossiers problématiques, parfois à tort.
+
+En contrepartie, il détecte avec une précision supérieure à la baseline les vrais défauts (F1 défaut : 0.43 vs 0.09).
+
 
 ## Précautions avant mise en production
 
@@ -43,9 +54,8 @@ davantage de fausses alertes. »*)
 
 ## Recommandation
 
-✅ **Remplacer Pyrenex-risk-v1** par v2 *OU* ⛔ **Ne pas remplacer** —
-choisis et justifie en une phrase.
-
+✅ **Remplacer Pyrenex-risk-v1** 
+L'objectif étant de détecter plus de défauts, le modèle v2 est recommandé pour la mise en production au vu de performances bien supérieures sur le sujet.
 ---
 
-*Signé : <prenom> <nom>, FastIA, le YYYY-MM-DD*
+*Signé : Alexandre NASCIMENTO, FastIA, le 2026-07-08*

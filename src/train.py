@@ -28,7 +28,7 @@ from pathlib import Path
 import joblib
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.metrics import f1_score, roc_auc_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -56,6 +56,44 @@ CONFIGS: dict[str, dict] = {
         "n_jobs": -1,
     },
     # TODO — ajoute ton propre jeu d'hyperparamètres ici
+    "deep": {
+        "n_estimators": 20000,
+        "max_depth": 15,
+        "min_samples_leaf": 20,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample",
+        "random_state": 42,
+        "n_jobs": -1,
+    },
+    "balanced_subsample_500": {
+        "n_estimators": 500,
+        "max_depth": 15,
+        "min_samples_leaf": 20,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample",
+        "random_state": 42,
+        "n_jobs": -1,
+    },
+    "balanced_deeper": {
+        "n_estimators": 500,
+        "max_depth": 20,
+        "min_samples_leaf": 10,
+        "min_samples_split": 20,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample",
+        "random_state": 42,
+        "n_jobs": -1,
+    },
+    "balanced_regularized": {
+        "n_estimators": 500,
+        "max_depth": 12,
+        "min_samples_leaf": 30,
+        "min_samples_split": 50,
+        "max_features": "sqrt",
+        "class_weight": "balanced_subsample",
+        "random_state": 42,
+        "n_jobs": -1,
+    },
 }
 
 
@@ -80,7 +118,9 @@ def train(config_name: str, data_path: Path, output_dir: Path) -> dict:
     y_proba = pipeline.predict_proba(X_test)[:, 1]
     metrics = {
         "f1_macro": f1_score(y_test, pipeline.predict(X_test), average="macro"),
+        "f1 defaut": f1_score(y_test, pipeline.predict(X_test), pos_label=1),
         "roc_auc": roc_auc_score(y_test, y_proba),
+        "recall": recall_score(y_test, pipeline.predict(X_test), pos_label=1),
     }
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -110,6 +150,9 @@ def train(config_name: str, data_path: Path, output_dir: Path) -> dict:
 
 
 def main() -> None:
+    ## start stopwatch
+    start = datetime.now()
+
     parser = argparse.ArgumentParser(description="Train Pyrenex risk model")
     parser.add_argument("--config", default="default", choices=list(CONFIGS))
     parser.add_argument("--data", default="data/lending_club_train.csv", type=Path)
@@ -126,6 +169,9 @@ def main() -> None:
         f"  cp {result['meta_path']} {args.output}/pyrenex_risk_v2.json\n"
         "  python src/evaluate.py --update-meta"
     )
+
+    stop = datetime.now()
+    print(f"\nTraining completed in {stop - start} (hh:mm:ss)")
 
 
 if __name__ == "__main__":

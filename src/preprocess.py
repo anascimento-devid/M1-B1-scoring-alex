@@ -19,9 +19,23 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 # TODO — fill these lists from your EDA
 NUMERIC_FEATURES: list[str] = [
+    "loan_amnt",
+    "int_rate",
+    "installment",
+    "annual_inc",
+    "dti",
+    "delinq_2yrs",
+    "fico_range_low",
+    "revol_util",
     # e.g. "loan_amnt", "int_rate", "annual_inc", ...
 ]
 CATEGORICAL_FEATURES: list[str] = [
+    "term",
+    "grade",
+    "home_ownership",
+    "verification_status",
+    "purpose",
+    "emp_length",
     # e.g. "term", "grade", "home_ownership", "purpose", ...
 ]
 TARGET_COLUMN: str = "loan_status"
